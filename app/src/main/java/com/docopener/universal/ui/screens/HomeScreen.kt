@@ -3,6 +3,7 @@ package com.docopener.universal.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,26 +15,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -46,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +52,16 @@ import com.docopener.universal.domain.DocumentCategory
 import com.docopener.universal.domain.DocumentItem
 import com.docopener.universal.ui.components.CategoryPills
 import com.docopener.universal.ui.components.DocCard
+import com.docopener.universal.ui.components.FloatingDock
 import com.docopener.universal.ui.components.StorageSummaryBar
+import com.docopener.universal.ui.theme.AccentPrimaryLight
+import com.docopener.universal.ui.theme.DarkBackground
+import com.docopener.universal.ui.theme.DarkBorder
+import com.docopener.universal.ui.theme.DarkCard
+import com.docopener.universal.ui.theme.DarkSurface
+import com.docopener.universal.ui.theme.TextMuted
+import com.docopener.universal.ui.theme.TextPrimary
+import com.docopener.universal.ui.theme.TextSecondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +77,7 @@ fun HomeScreen(
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf(DocumentCategory.ALL) }
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: All Files, 1: Recent, 2: Bookmarks
+    var selectedTab by remember { mutableIntStateOf(0) } // 0: All Files, 1: Recent, 2: Saved/Bookmarks
 
     val recentDocs by recentRepo.recentDocs.collectAsState()
     val favoriteUris by recentRepo.favoriteUris.collectAsState()
@@ -114,86 +121,72 @@ fun HomeScreen(
     }
 
     Scaffold(
+        containerColor = DarkBackground,
         topBar = {
             TopAppBar(
                 title = {
-                    Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "OmniDoc Viewer",
+                            text = "OmniDoc",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = TextPrimary,
+                            letterSpacing = (-0.5).sp
                         )
-                        Text(
-                            text = "Offline Universal Document Opener",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .background(AccentPrimaryLight.copy(alpha = 0.15f), RoundedCornerShape(6.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "OFFLINE",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = AccentPrimaryLight,
+                                letterSpacing = 0.5.sp
+                            )
+                        }
                     }
                 },
                 actions = {
-                    IconButton(onClick = onNavigateToCreatePdf) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Create PDF",
-                            tint = Color(0xFFE53935)
-                        )
-                    }
                     IconButton(onClick = onRefresh) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = "Refresh",
-                            tint = MaterialTheme.colorScheme.onSurface
+                            tint = TextSecondary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = DarkBackground
                 )
             )
         },
-        floatingActionButton = {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FloatingActionButton(
-                    onClick = onNavigateToCreatePdf,
-                    containerColor = Color(0xFFE53935),
-                    contentColor = Color.White
-                ) {
-                    Row(modifier = Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Make PDF")
-                        Spacer(modifier = Modifier.size(6.dp))
-                        Text(text = "Make PDF", fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                FloatingActionButton(
-                    onClick = {
-                        filePicker.launch(
-                            arrayOf(
-                                "application/pdf",
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                "application/msword",
-                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                "application/vnd.ms-excel",
-                                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                                "application/vnd.ms-powerpoint",
-                                "text/*",
-                                "application/epub+zip",
-                                "application/rtf",
-                                "*/*"
-                            )
+        bottomBar = {
+            FloatingDock(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                onMakePdf = onNavigateToCreatePdf,
+                onOpenFile = {
+                    filePicker.launch(
+                        arrayOf(
+                            "application/pdf",
+                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                            "application/msword",
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                            "application/vnd.ms-excel",
+                            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                            "application/vnd.ms-powerpoint",
+                            "text/*",
+                            "application/epub+zip",
+                            "application/rtf",
+                            "*/*"
                         )
-                    },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                ) {
-                    Row(modifier = Modifier.padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(imageVector = Icons.Default.FolderOpen, contentDescription = "Open File")
-                        Spacer(modifier = Modifier.size(6.dp))
-                        Text(text = "Open File", fontWeight = FontWeight.Bold)
-                    }
+                    )
                 }
-            }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -201,64 +194,52 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            // Search Input
+            // Minimal Search Bar
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search any document offline...") },
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                placeholder = {
+                    Text(
+                        text = "Search documents by name or extension...",
+                        fontSize = 14.sp,
+                        color = TextMuted
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                        tint = TextMuted,
+                        modifier = Modifier.size(18.dp)
                     )
                 },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear")
+                            Icon(imageVector = Icons.Default.Clear, contentDescription = "Clear", tint = TextMuted, modifier = Modifier.size(16.dp))
                         }
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary,
+                    focusedContainerColor = DarkCard,
+                    unfocusedContainerColor = DarkCard,
+                    focusedBorderColor = AccentPrimaryLight,
+                    unfocusedBorderColor = DarkBorder
                 )
             )
 
-            // Storage Overview Dashboard
+            // Storage Overview
             StorageSummaryBar(
                 totalFiles = documents.size,
                 countsByCategory = countsByCategory
             )
-
-            // Tabs: All Files, Recent, Bookmarks
-            ScrollableTabRow(
-                selectedTabIndex = selectedTab,
-                edgePadding = 16.dp,
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                Tab(
-                    selected = selectedTab == 0,
-                    onClick = { selectedTab = 0 },
-                    text = { Text("All Files (${documents.size})") }
-                )
-                Tab(
-                    selected = selectedTab == 1,
-                    onClick = { selectedTab = 1 },
-                    text = { Text("Recent (${recentDocs.size})") }
-                )
-                Tab(
-                    selected = selectedTab == 2,
-                    onClick = { selectedTab = 2 },
-                    text = { Text("Bookmarks (${favoriteUris.size})") }
-                )
-            }
 
             // Category Filter Pills
             CategoryPills(
@@ -267,10 +248,16 @@ fun HomeScreen(
                 counts = countsByCategory
             )
 
+            Spacer(modifier = Modifier.height(4.dp))
+
             // Document List
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator(
+                        color = AccentPrimaryLight,
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 2.5.dp
+                    )
                 }
             } else if (displayedDocuments.isEmpty()) {
                 Box(
@@ -280,23 +267,31 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = if (searchQuery.isNotEmpty()) "No matching documents found" else "No documents found",
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium),
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        Icon(
+                            imageVector = Icons.Default.Description,
+                            contentDescription = null,
+                            tint = TextMuted,
+                            modifier = Modifier.size(48.dp)
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Tap 'Open File' or copy documents to your device.",
+                            text = if (searchQuery.isNotEmpty()) "No matching documents" else "No documents found",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = TextPrimary
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = "Tap 'Browse' or 'Make PDF' to get started.",
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                            color = TextSecondary
                         )
                     }
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 6.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(displayedDocuments, key = { it.uri.toString() }) { doc ->

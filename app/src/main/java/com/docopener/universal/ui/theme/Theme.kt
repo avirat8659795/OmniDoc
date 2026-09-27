@@ -1,45 +1,33 @@
 package com.docopener.universal.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryBlue,
-    secondary = SecondaryTeal,
-    background = BackgroundDark,
-    surface = SurfaceDark,
-    surfaceVariant = CardBackgroundDark,
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = Color.White,
-    onSurface = Color.White
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = PrimaryBlue,
-    secondary = SecondaryTeal,
-    background = Color(0xFFF8F9FA),
-    surface = Color.White,
-    surfaceVariant = Color(0xFFF1F3F4),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onBackground = Color(0xFF202124),
-    onSurface = Color(0xFF202124)
+private val ProfessionalDarkColorScheme = darkColorScheme(
+    primary = AccentPrimaryLight,
+    onPrimary = DarkBackground,
+    primaryContainer = AccentPrimary,
+    onPrimaryContainer = TextPrimary,
+    secondary = AccentCyan,
+    onSecondary = DarkBackground,
+    background = DarkBackground,
+    onBackground = TextPrimary,
+    surface = DarkSurface,
+    onSurface = TextPrimary,
+    surfaceVariant = DarkCard,
+    onSurfaceVariant = TextSecondary,
+    outline = DarkBorder,
+    outlineVariant = DarkBorderLight
 )
 
 @Composable
 fun UniversalDocTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
-
+    // Professional minimal OLED / Charcoal Dark Mode by default
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = ProfessionalDarkColorScheme,
         content = content
     )
 }

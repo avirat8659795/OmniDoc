@@ -39,9 +39,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -73,6 +73,16 @@ import com.docopener.universal.engine.PageMargin
 import com.docopener.universal.engine.PageOrientation
 import com.docopener.universal.engine.PdfCreationOptions
 import com.docopener.universal.engine.PdfCreatorEngine
+import com.docopener.universal.ui.theme.AccentPrimary
+import com.docopener.universal.ui.theme.AccentPrimaryLight
+import com.docopener.universal.ui.theme.DarkBackground
+import com.docopener.universal.ui.theme.DarkBorder
+import com.docopener.universal.ui.theme.DarkCard
+import com.docopener.universal.ui.theme.DarkSurface
+import com.docopener.universal.ui.theme.DocBadgePdf
+import com.docopener.universal.ui.theme.TextMuted
+import com.docopener.universal.ui.theme.TextPrimary
+import com.docopener.universal.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -109,21 +119,23 @@ fun CreatePdfScreen(
     }
 
     Scaffold(
+        containerColor = DarkBackground,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = "Create PDF Document",
+                        text = "Make PDF",
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkBackground)
             )
         }
     ) { padding ->
@@ -134,19 +146,20 @@ fun CreatePdfScreen(
         ) {
             TabRow(
                 selectedTabIndex = selectedMode,
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = DarkSurface,
+                contentColor = AccentPrimaryLight
             ) {
                 Tab(
                     selected = selectedMode == 0,
                     onClick = { selectedMode = 0 },
-                    icon = { Icon(Icons.Default.Image, contentDescription = null) },
-                    text = { Text("Pictures to PDF") }
+                    icon = { Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(20.dp)) },
+                    text = { Text("Pictures to PDF", fontSize = 13.sp, fontWeight = FontWeight.Medium) }
                 )
                 Tab(
                     selected = selectedMode == 1,
                     onClick = { selectedMode = 1 },
-                    icon = { Icon(Icons.Default.Description, contentDescription = null) },
-                    text = { Text("Text/Notes to PDF") }
+                    icon = { Icon(Icons.Default.Description, contentDescription = null, modifier = Modifier.size(20.dp)) },
+                    text = { Text("Text/Notes to PDF", fontSize = 13.sp, fontWeight = FontWeight.Medium) }
                 )
             }
 
@@ -160,42 +173,53 @@ fun CreatePdfScreen(
                 if (selectedMode == 0) {
                     // IMAGE TO PDF FLOW
                     Text(
-                        text = "1. Document Name",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        text = "Document Title",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = TextSecondary
                     )
                     OutlinedTextField(
                         value = pdfTitle,
                         onValueChange = { pdfTitle = it },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkCard,
+                            unfocusedContainerColor = DarkCard,
+                            focusedBorderColor = AccentPrimaryLight,
+                            unfocusedBorderColor = DarkBorder
+                        )
                     )
 
                     Text(
-                        text = "2. Select Pictures (${selectedImages.size} selected)",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        text = "Selected Pictures (${selectedImages.size})",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = TextSecondary
                     )
 
                     // Add Pictures Button & Thumbnails
-                    Card(
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp)),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(DarkCard)
+                            .border(0.75.dp, DarkBorder, RoundedCornerShape(16.dp))
+                            .padding(16.dp)
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
+                        Column {
                             Button(
                                 onClick = { imagePicker.launch("image/*") },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().height(48.dp),
                                 shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                                colors = ButtonDefaults.buttonColors(containerColor = AccentPrimary)
                             ) {
-                                Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null)
+                                Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null, tint = Color.White)
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text(text = "Choose Pictures / Photos")
+                                Text(text = "Select Pictures / Photos", fontWeight = FontWeight.SemiBold, color = Color.White)
                             }
 
                             if (selectedImages.isNotEmpty()) {
@@ -206,10 +230,10 @@ fun CreatePdfScreen(
                                     itemsIndexed(selectedImages) { index, uri ->
                                         Box(
                                             modifier = Modifier
-                                                .size(90.dp)
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .background(MaterialTheme.colorScheme.surface)
-                                                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.dp))
+                                                .size(86.dp)
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(DarkSurface)
+                                                .border(0.75.dp, DarkBorder, RoundedCornerShape(12.dp))
                                         ) {
                                             Column(
                                                 modifier = Modifier.fillMaxSize().padding(8.dp),
@@ -219,13 +243,15 @@ fun CreatePdfScreen(
                                                 Icon(
                                                     imageVector = Icons.Default.Image,
                                                     contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(28.dp)
+                                                    tint = AccentPrimaryLight,
+                                                    modifier = Modifier.size(26.dp)
                                                 )
+                                                Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
                                                     text = "Page ${index + 1}",
                                                     fontSize = 11.sp,
-                                                    fontWeight = FontWeight.Bold
+                                                    color = TextPrimary,
+                                                    fontWeight = FontWeight.Medium
                                                 )
                                             }
 
@@ -235,13 +261,13 @@ fun CreatePdfScreen(
                                                 modifier = Modifier
                                                     .align(Alignment.TopEnd)
                                                     .size(24.dp)
-                                                    .background(Color.Black.copy(alpha = 0.6f), CircleShape)
+                                                    .background(Color.Black.copy(alpha = 0.7f), CircleShape)
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Default.Close,
                                                     contentDescription = "Remove",
                                                     tint = Color.White,
-                                                    modifier = Modifier.size(14.dp)
+                                                    modifier = Modifier.size(13.dp)
                                                 )
                                             }
                                         }
@@ -253,9 +279,10 @@ fun CreatePdfScreen(
 
                     // Page Orientation & Margin Settings
                     Text(
-                        text = "3. Page Layout Settings",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        text = "Page Layout",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = TextSecondary
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -264,17 +291,29 @@ fun CreatePdfScreen(
                         FilterChip(
                             selected = orientation == PageOrientation.PORTRAIT,
                             onClick = { orientation = PageOrientation.PORTRAIT },
-                            label = { Text("Portrait") }
+                            label = { Text("Portrait") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentPrimary,
+                                selectedLabelColor = Color.White
+                            )
                         )
                         FilterChip(
                             selected = orientation == PageOrientation.LANDSCAPE,
                             onClick = { orientation = PageOrientation.LANDSCAPE },
-                            label = { Text("Landscape") }
+                            label = { Text("Landscape") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentPrimary,
+                                selectedLabelColor = Color.White
+                            )
                         )
                         FilterChip(
                             selected = orientation == PageOrientation.AUTO_MATCH_IMAGE,
                             onClick = { orientation = PageOrientation.AUTO_MATCH_IMAGE },
-                            label = { Text("Auto Fit") }
+                            label = { Text("Auto-Fit") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = AccentPrimary,
+                                selectedLabelColor = Color.White
+                            )
                         )
                     }
 
@@ -317,37 +356,47 @@ fun CreatePdfScreen(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         enabled = !isCreating && selectedImages.isNotEmpty(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentPrimaryLight)
                     ) {
                         if (isCreating) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(color = DarkBackground, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
                             Spacer(modifier = Modifier.width(10.dp))
-                            Text("Building PDF...", fontWeight = FontWeight.Bold)
+                            Text("Building PDF...", fontWeight = FontWeight.Bold, color = DarkBackground)
                         } else {
-                            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null)
+                            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null, tint = DarkBackground)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Convert ${selectedImages.size} Pictures to PDF", fontWeight = FontWeight.Bold)
+                            Text("Convert ${selectedImages.size} Pictures to PDF", fontWeight = FontWeight.Bold, color = DarkBackground)
                         }
                     }
                 } else {
                     // TEXT TO PDF FLOW
                     Text(
                         text = "Document Title",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = TextSecondary
                     )
                     OutlinedTextField(
                         value = textDocTitle,
                         onValueChange = { textDocTitle = it },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkCard,
+                            unfocusedContainerColor = DarkCard,
+                            focusedBorderColor = AccentPrimaryLight,
+                            unfocusedBorderColor = DarkBorder
+                        )
                     )
 
                     Text(
                         text = "Document Text / Notes",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = TextSecondary
                     )
                     OutlinedTextField(
                         value = textBody,
@@ -355,8 +404,16 @@ fun CreatePdfScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(260.dp),
-                        placeholder = { Text("Type or paste any text or notes to turn into a clean formatted PDF...") },
-                        shape = RoundedCornerShape(12.dp)
+                        placeholder = { Text("Type or paste any text or notes to turn into a clean formatted PDF...", color = TextMuted) },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = TextPrimary,
+                            unfocusedTextColor = TextPrimary,
+                            focusedContainerColor = DarkCard,
+                            unfocusedContainerColor = DarkCard,
+                            focusedBorderColor = AccentPrimaryLight,
+                            unfocusedBorderColor = DarkBorder
+                        )
                     )
 
                     Button(
@@ -393,16 +450,16 @@ fun CreatePdfScreen(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         enabled = !isCreating && textBody.isNotBlank(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentPrimaryLight)
                     ) {
                         if (isCreating) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(color = DarkBackground, modifier = Modifier.size(22.dp), strokeWidth = 2.dp)
                             Spacer(modifier = Modifier.width(10.dp))
-                            Text("Generating PDF...", fontWeight = FontWeight.Bold)
+                            Text("Generating PDF...", fontWeight = FontWeight.Bold, color = DarkBackground)
                         } else {
-                            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null)
+                            Icon(imageVector = Icons.Default.PictureAsPdf, contentDescription = null, tint = DarkBackground)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Generate PDF from Text", fontWeight = FontWeight.Bold)
+                            Text("Generate PDF from Text", fontWeight = FontWeight.Bold, color = DarkBackground)
                         }
                     }
                 }
