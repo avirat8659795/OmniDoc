@@ -183,7 +183,7 @@ private fun RenderParagraph(paragraph: DocxParagraph, fontScale: Float) {
                         fontWeight = if (run.isBold || paragraph.isBold || paragraph.isHeading) FontWeight.Bold else FontWeight.Normal,
                         fontStyle = if (run.isItalic || paragraph.isItalic) FontStyle.Italic else FontStyle.Normal,
                         textDecoration = if (run.isUnderline) TextDecoration.Underline else TextDecoration.None,
-                        fontSize = (if (paragraph.isHeading) 18f else 15f) * fontScale.sp
+                        fontSize = ((if (paragraph.isHeading) 18f else 15f) * fontScale).sp
                     )
                 ) {
                     append(run.text)
