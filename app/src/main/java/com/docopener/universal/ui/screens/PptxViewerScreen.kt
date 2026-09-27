@@ -57,7 +57,7 @@ import com.docopener.universal.domain.PptxSlide
 import com.docopener.universal.engine.PptxEngine
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PptxViewerScreen(
     uri: Uri,
