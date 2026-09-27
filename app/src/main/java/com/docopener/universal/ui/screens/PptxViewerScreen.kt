@@ -1,6 +1,7 @@
 package com.docopener.universal.ui.screens
 
 import android.net.Uri
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -195,6 +196,7 @@ fun PptxViewerScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SlideCard(slide: PptxSlide, totalSlides: Int) {
     Card(
