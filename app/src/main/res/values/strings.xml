@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">OmniDoc Viewer</string>
+    <string name="tab_all">All</string>
+    <string name="tab_pdf">PDF</string>
+    <string name="tab_word">Word</string>
+    <string name="tab_excel">Excel</string>
+    <string name="tab_ppt">PPT</string>
+    <string name="tab_text">Text</string>
+    <string name="tab_epub">eBooks</string>
+    <string name="search_hint">Search documents by title or extension...</string>
+    <string name="storage_permission_rationale">OmniDoc Viewer needs storage access to scan and open your documents offline.</string>
+</resources>
